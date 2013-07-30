@@ -476,6 +476,50 @@ routerSuite.add(new Y.Test.Case({
         this.wait(1000);
     },
 
+    'replace() should be able to be called with no args using html5': function () {
+        var test   = this,
+            router = this.router = new Y.Router(),
+            path   = '/replace';
+
+        router.save(path);
+        router.route(path, function (req) {
+            test.resume(function () {
+                Assert.areSame(path, req.path);
+                Assert.isObject(req.query);
+            });
+        });
+
+        // Wrapped in a setTimeout to make the async test work on iOS<5, which
+        // performs this action synchronously.
+        setTimeout(function () {
+            router.replace();
+        }, 1);
+
+        this.wait(1000);
+    },
+
+    'replace() should be able to be called with no args using not html5': function () {
+        var test   = this,
+            router = this.router = new Y.Router({html5: false}),
+            path   = '/replace';
+
+        router.save(path);
+        router.route(path, function (req) {
+            test.resume(function () {
+                Assert.areSame(path, req.path);
+                Assert.isObject(req.query);
+            });
+        });
+
+        // Wrapped in a setTimeout to make the async test work on iOS<5, which
+        // performs this action synchronously.
+        setTimeout(function () {
+            router.replace();
+        }, 1);
+
+        this.wait(1000);
+    },
+
     'save() should create a new history entry': function () {
         var test   = this,
             router = this.router = new Y.Router();
@@ -571,7 +615,7 @@ routerSuite.add(new Y.Test.Case({
         this.wait(1000);
     },
 
-    'save() should dispath in non HTML5 browsers even when the `hash` does not change': function () {
+    'save() should dispatch in non HTML5 browsers even when the `hash` does not change': function () {
         var test = this,
             router;
 
@@ -945,11 +989,27 @@ routerSuite.add(new Y.Test.Case({
             ArrayAssert.itemsAreSame(['/baz/quux', 'baz', 'quux'], req.params);
         });
 
+        router.route(/^\/((fnord)|(fnarf))\/(quux)$/, function (req) {
+            calls += 1;
+
+            Assert.isArray(req.params);
+            ArrayAssert.itemsAreSame(['/fnord/quux', 'fnord', 'fnord', undefined, 'quux'], req.params);
+        });
+
+        router.route(/^\/((blorp)|(blerf))\/(quux)$/, function (req) {
+            calls += 1;
+
+            Assert.isArray(req.params);
+            ArrayAssert.itemsAreSame(['/blerf/quux', 'blerf', undefined, 'blerf', 'quux'], req.params);
+        });
+
         router._dispatch('/foo/one/two', {});
         router._dispatch('/bar/one/two', {});
         router._dispatch('/baz/quux', {});
+        router._dispatch('/fnord/quux', {});
+        router._dispatch('/blerf/quux', {});
 
-        Assert.areSame(3, calls);
+        Assert.areSame(5, calls);
     },
 
     'route parameters should be decoded': function () {

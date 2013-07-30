@@ -1,6 +1,65 @@
 App Framework Change History
 ============================
 
+@VERSION@
+------
+
+### ModelList
+
+* Added support for descending sort order via `sort({descending: true})`. In
+  order to support this, the `options` passed to `sort()` are now passed along
+  to the protected `_sort()` method. ([#1004][]: @rishabhm)
+
+### Router
+
+* Fixed issue with trying to URL-decode matching path segments that are
+  `undefined`. Routes defined as Regexps (instead of strings) can contain an
+  arbitrary number of captures; when executing the regex during dispatching, its
+  array of matches can contain `undefined` values. Router will now check that a
+  match is a truthy value before trying to URL-decode it.
+
+
+[#1004]: https://github.com/yui/yui3/issues/1004
+
+
+3.11.0
+------
+
+* No changes.
+
+
+3.10.3
+------
+
+* No changes.
+
+
+3.10.2
+------
+
+### Router
+
+* Router now properly dispatches when using hash-based URLs and calling
+  `replace()` without arguments; before it would throw an error. [#739]
+
+
+3.10.1
+------
+
+* No changes.
+
+
+3.10.0
+------
+
+### Model
+
+* Fixed: The `options` object passed to Model's `setAttrs()` method was being
+  modified. Now a shallow copy of this object is now created so that the
+  `_transaction` property is added to the copy and not the passed-in object.
+  [#598]
+
+
 3.9.1
 -----
 
